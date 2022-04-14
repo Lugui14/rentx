@@ -5,7 +5,7 @@ import { CreateSpecificationController } from "@modules/cars/useCases/createSpec
 
 const specificationRoutes = Router();
 
-const createSpecificationController = new CreateSpecificationController();
+let createSpecificationController = new CreateSpecificationController();
 
 specificationRoutes.use(ensureAuthenticate);
 specificationRoutes.post("/", createSpecificationController.handle);
