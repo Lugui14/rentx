@@ -1,15 +1,20 @@
 import { InMemoryCarsRepository } from "@modules/cars/repositories/in-memory/InMemoryCarsRepository";
-import { AppError } from "@shared/errors/AppError";
+import { InMemorySpecificationRepository } from "@modules/cars/repositories/in-memory/InMemorySpecificationRepository";
 import { CreateCarSpecificationUseCase } from "./CreateCarSpecificationUseCase";
 
+import { AppError } from "@shared/errors/AppError";
+
 let carsRepositoryInMemory: InMemoryCarsRepository;
+let specificationRepositoryInMemory: InMemorySpecificationRepository;
 let createCarSpecificationUseCase: CreateCarSpecificationUseCase;
 
 describe("Create car specification", () => {
 	beforeEach(() => {
 		carsRepositoryInMemory = new InMemoryCarsRepository();
+		specificationRepositoryInMemory = new InMemorySpecificationRepository();
 		createCarSpecificationUseCase = new CreateCarSpecificationUseCase(
-			carsRepositoryInMemory
+			carsRepositoryInMemory,
+			specificationRepositoryInMemory
 		);
 	});
 
@@ -24,20 +29,32 @@ describe("Create car specification", () => {
 			category_id: "category",
 		});
 
-		const specifications_id = ["54321"];
+		const specification = await specificationRepositoryInMemory.create({
+			name: "test",
+			description: "test",
+		});
 
-		createCarSpecificationUseCase.execute({
+		const specifications_id = [specification.id];
+
+		const specificationsCar = await createCarSpecificationUseCase.execute({
 			car_id: car.id,
 			specifications_id,
 		});
+
+		expect(specificationsCar).toHaveProperty("specifications");
+		expect(specificationsCar.specifications.length).toBe(1);
 	});
 
-	it("should not be able to add a specification from a not existent car", () => {
-		expect(() => {
+	it("should not be able to add a specification from a non-existent car", async () => {
+		expect(async () => {
 			const car_id = "1234";
+			0;
 			const specifications_id = ["54321"];
 
-			createCarSpecificationUseCase.execute({ car_id, specifications_id });
+			await createCarSpecificationUseCase.execute({
+				car_id,
+				specifications_id,
+			});
 		}).rejects.toBeInstanceOf(AppError);
 	});
 });
