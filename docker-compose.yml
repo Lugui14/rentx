@@ -1,9 +1,9 @@
-version: "3.9"
+version: "3.3"
 
 services:
-  database_ignite:
+  database-ignite:
     image: postgres
-    container_name: database_ignite
+    container_name: database-ignite
     restart: always
     network_mode: "host"
     environment:
